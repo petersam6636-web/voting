@@ -161,6 +161,7 @@ export default function SettingsPage() {
         const trigger = ScrollTrigger.create({
           trigger: layoutRef.current,
           pin: accountCard,
+          scrub: 0.1,
           start: "top top+=24",
           end: () => {
             const currentAccountHeight = accountCard.offsetHeight;
@@ -432,55 +433,6 @@ console.log(2)
                   </div>
 
                   {/* Email Information */}
-
-                  <div>
-
-                    <div className="mb-3 flex items-center gap-2">
-
-                      <Mail className="h-4 w-4 text-emerald-400" />
-
-                      <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
-                        Account email
-                      </h3>
-
-                    </div>
-
-                    <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 transition-colors duration-200 hover:border-emerald-400/[0.15] hover:bg-white/[0.04]">
-
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.035]">
-
-                        <Mail className="h-[17px] w-[17px] text-gray-400" />
-
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500">
-                          Email address
-                        </p>
-
-                        <p className="mt-1 break-all text-sm font-medium text-gray-200">
-                          {userEmail}
-                        </p>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  {/* Account Note */}
-
-                  <div className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3.5">
-
-                    <Info className="mt-0.5 h-4 w-4 shrink-0 text-gray-500" />
-
-                    <p className="text-xs leading-5 text-gray-500">
-                      Your account information is displayed here for
-                      reference. Profile editing is not currently available.
-                    </p>
-
-                  </div>
 
                 </div>
 
