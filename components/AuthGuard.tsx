@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LoaderCircle, ShieldCheck } from "lucide-react";
 import { supabase } from "@/lib/supabase-client";
 
@@ -12,15 +12,44 @@ type AuthGuardProps = {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [checking, setChecking] = useState(true);
   const checkingRef = useRef(false);
-  const mountedRef = useRef(false);
+
+  const staticHomeRoutes = new Set([
+    "history",
+    "nominees",
+    "register",
+    "settings",
+    "share",
+    "starting",
+  ]);
+
+  const segments = pathname.split("/").filter(Boolean);
+  const isHomeDynamicRoute =
+    segments.length === 2 &&
+    segments[0] === "home" &&
+    !staticHomeRoutes.has(segments[1]);
+  const isSharedProjectRoute =
+    segments.length === 3 &&
+    segments[0] === "home" &&
+    segments[1] === "share";
+  const isPublicRoute = isHomeDynamicRoute || isSharedProjectRoute;
 
   useEffect(() => {
-    mountedRef.current = true;
-
     let active = true;
+
+    if (isPublicRoute) {
+      setChecking(false);
+      checkingRef.current = false;
+
+      return () => {
+        active = false;
+      };
+    }
+
+    setChecking(true);
 
     const verifyUser = async () => {
       // Prevent duplicate verification requests.
@@ -94,10 +123,9 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
     return () => {
       active = false;
-      mountedRef.current = false;
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, isPublicRoute]);
 
   // Do not render dashboard content before authentication
   // has been verified.
