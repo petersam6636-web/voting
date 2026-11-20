@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Share2,
   QrCode,
@@ -13,36 +13,76 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import useApp from "@/lib/useApp";
-export default function SharePage() {
-  const { project } = useApp();
+import { supabase } from "@/lib/supabase-client";
+import type { Project } from "@/types/project";
 
+export default function SharePage() {
+  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  const [loadingProject, setLoadingProject] = useState(true);
+  const [projectError, setProjectError] = useState("");
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
-  // Select the earliest-created project, matching the voting flow.
-  const currentProject = useMemo(() => {
-    if (!project?.length) return null;
+  useEffect(() => {
+    let active = true;
 
-    return [...project]
-      .filter((item) => !item.deleted)
-      .sort(
-        (a, b) =>
-          new Date(a.created_at).getTime() -
-          new Date(b.created_at).getTime()
-      )[0] ?? null;
-  }, [project]);
+    const loadCurrentProject = async () => {
+      setLoadingProject(true);
+      setProjectError("");
 
-  // Generate the public voting URL for the selected project.
+      try {
+        const { data: userData, error: userError } =
+          await supabase.auth.getUser();
+
+        if (userError) throw userError;
+        if (!userData.user) {
+          throw new Error("Sign in to generate an election sharing link.");
+        }
+
+        const { data, error } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("user_id", userData.user.id)
+          .eq("deleted", false)
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!active) return;
+
+        setCurrentProject(data as Project | null);
+      } catch (error: unknown) {
+        if (!active) return;
+
+        setProjectError(
+          error instanceof Error
+            ? error.message
+            : "Unable to load the election for sharing."
+        );
+      } finally {
+        if (active) setLoadingProject(false);
+      }
+    };
+
+    void loadCurrentProject();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (!currentProject?.id) {
       setShareUrl("");
+      setCopied(false);
       return;
     }
 
     setShareUrl(
       `${window.location.origin}/home/share/${currentProject.id}`
     );
+    setCopied(false);
   }, [currentProject?.id]);
 
   const handleCopyLink = async () => {
@@ -94,7 +134,23 @@ export default function SharePage() {
         </div>
       </section>
 
-      {!currentProject ? (
+      {loadingProject ? (
+        <section
+          className="rounded-2xl border border-white/[0.07] bg-[#0d1310] px-5 py-12 text-center"
+          role="status"
+        >
+          <p className="text-sm text-zinc-400">
+            Loading your election...
+          </p>
+        </section>
+      ) : projectError ? (
+        <section
+          className="rounded-2xl border border-red-400/15 bg-[#0d1310] px-5 py-12 text-center"
+          role="alert"
+        >
+          <p className="text-sm text-red-300">{projectError}</p>
+        </section>
+      ) : !currentProject ? (
         <section className="rounded-2xl border border-white/[0.07] bg-[#0d1310] px-5 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.06] text-emerald-400">
             <Share2 size={24} />
