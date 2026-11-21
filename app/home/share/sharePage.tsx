@@ -142,18 +142,10 @@ export default function SharePage() {
 
       <div className="w-full max-w-3xl">
         <header className="mb-8 text-center sm:mb-10">
-          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
-            Voter access
-          </div>
 
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Share your election
           </h1>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-zinc-400">
-            One scan takes voters directly to your election. They can review
-            the nominees and confirm their own vote.
-          </p>
         </header>
 
         {loadingProject ? (
@@ -204,20 +196,11 @@ export default function SharePage() {
               className="pointer-events-none absolute bottom-[18%] right-5 h-5 w-5 rounded-full border border-emerald-300/20 bg-emerald-400/[0.06]"
             />
 
-            <div className="relative text-center">
-              <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
-                <ShieldCheck size={13} />
-                Current election
-              </div>
+
 
               <h2 className="mx-auto max-w-xl break-words text-xl font-semibold tracking-tight text-white sm:text-2xl">
                 {currentProject.name || "Untitled election"}
               </h2>
-              {currentProject.description && (
-                <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-zinc-400">
-                  {currentProject.description}
-                </p>
-              )}
 
               <p className="mt-6 text-xs text-zinc-500">
                 Scan the code with a phone camera to open the voting page
