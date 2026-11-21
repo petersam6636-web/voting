@@ -17,25 +17,16 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const [checking, setChecking] = useState(true);
   const checkingRef = useRef(false);
 
-  const staticHomeRoutes = new Set([
-    "history",
-    "nominees",
-    "register",
-    "settings",
-    "share",
-    "starting",
-  ]);
-
   const segments = pathname.split("/").filter(Boolean);
-  const isHomeDynamicRoute =
-    segments.length === 2 &&
+  const isNomineeDetailsRoute =
+    segments.length === 3 &&
     segments[0] === "home" &&
-    !staticHomeRoutes.has(segments[1]);
+    segments[1] === "nominees";
   const isSharedProjectRoute =
     segments.length === 3 &&
     segments[0] === "home" &&
     segments[1] === "share";
-  const isPublicRoute = isHomeDynamicRoute || isSharedProjectRoute;
+  const isPublicRoute = isNomineeDetailsRoute || isSharedProjectRoute;
 
   useEffect(() => {
     let active = true;

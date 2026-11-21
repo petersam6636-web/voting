@@ -7,7 +7,7 @@ import {
   Vote,
   Users,
   UserRound,
-  MessageSquare,
+  Crown,
   Trophy,
   ShieldCheck,
   CalendarDays,
@@ -438,6 +438,14 @@ export default function ActiveProject() {
       total + (nominee.voters?.length ?? 0),
     0
   );
+  const highestVoteCount =
+    topNominees[0]?.voters?.length ?? 0;
+  const leadersCount =
+    highestVoteCount > 0
+      ? nominees.filter(
+          (nominee) => (nominee.voters?.length ?? 0) === highestVoteCount
+        ).length
+      : 0;
 
   const totalAchievements = nominees.reduce(
     (total, nominee) =>
@@ -910,130 +918,161 @@ export default function ActiveProject() {
           </div>
         ) : (
           <div className="space-y-4">
-            {topNominees.map((nominee, index) => (
-              <article
-                key={nominee.id}
-                className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1310]"
-              >
-                {/* Nominee information */}
+            {topNominees.map((nominee, index) => {
+              const voteCount = nominee.voters?.length ?? 0;
+              const votePercentage =
+                totalVoters > 0 ? (voteCount / totalVoters) * 100 : 0;
+              const isLeader =
+                voteCount > 0 && voteCount === highestVoteCount;
+              const rank =
+                nominees.filter(
+                  (item) => (item.voters?.length ?? 0) > voteCount
+                ).length + 1;
+              const rankLabel =
+                totalVoters > 0 ? `Rank #${rank}` : `Nominee #${index + 1}`;
 
-                <div className="flex flex-wrap items-center justify-between gap-4 p-5">
-                  <div className="flex min-w-0 items-center gap-3">
-                    {nominee.image ? (
-                      <img
-                        src={nominee.image}
-                        alt={nominee.name}
-                        className="h-12 w-12 rounded-xl border border-white/10 object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-emerald-400/15 bg-emerald-400/10 text-emerald-400">
-                        <UserRound size={21} />
+              return (
+                <article
+                  key={nominee.id}
+                  className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1310]"
+                >
+                  {/* Nominee information */}
+
+                  <div className="flex flex-wrap items-center justify-between gap-4 p-5">
+                    <div className="flex min-w-0 items-center gap-3">
+                      {nominee.image ? (
+                        <img
+                          src={nominee.image}
+                          alt={nominee.name}
+                          className="h-12 w-12 rounded-xl border border-white/10 object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-emerald-400/15 bg-emerald-400/10 text-emerald-400">
+                          <UserRound size={21} />
+                        </div>
+                      )}
+
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {nominee.name}
+                          </p>
+                          {isLeader && (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-yellow-300/20 bg-yellow-300/[0.07] px-2 py-1 text-[10px] font-semibold text-yellow-200">
+                              <Crown size={12} />
+                              {leadersCount > 1
+                                ? "Tied for first"
+                                : "First place"}
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="mt-1 text-[11px] text-zinc-500">
+                          {rankLabel}
+                        </p>
                       </div>
-                    )}
+                    </div>
 
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-white">
-                        {nominee.name}
-                      </p>
+                    <div className="flex items-center gap-2 rounded-xl border border-emerald-400/10 bg-emerald-400/[0.06] px-3 py-2">
+                      <Vote
+                        size={15}
+                        className="text-emerald-400"
+                      />
 
-                      <p className="mt-1 text-[11px] text-zinc-500">
-                        Nominee #{index + 1}
-                      </p>
+                      <span className="text-sm font-bold text-emerald-300">
+                        {voteCount}
+                      </span>
+
+                      <span className="text-[11px] text-zinc-500">
+                        Votes
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-xl border border-emerald-400/10 bg-emerald-400/[0.06] px-3 py-2">
-                    <Vote
-                      size={15}
-                      className="text-emerald-400"
-                    />
-
-                    <span className="text-sm font-bold text-emerald-300">
-                      {nominee.voters?.length ?? 0}
-                    </span>
-
-                    <span className="text-[11px] text-zinc-500">
-                      Votes
-                    </span>
-                  </div>
-                </div>
-
-                {/* Manifesto */}
-
-                {nominee.manifesto && (
                   <div className="border-t border-white/[0.06] px-5 py-4">
-                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                      Manifesto
-                    </p>
-
-                    <p className="text-sm leading-6 text-zinc-400">
-                      {nominee.manifesto}
-                    </p>
-                  </div>
-                )}
-
-                {/* Voters */}
-
-                <div className="border-t border-white/[0.06] p-5">
-                  <div className="mb-4 flex items-center gap-2">
-                    <Users
-                      size={15}
-                      className="text-emerald-400"
-                    />
-
-                    <h3 className="text-xs font-semibold text-zinc-300">
-                      Recorded Voters
-                    </h3>
-
-                    <span className="text-[10px] text-zinc-600">
-                      ({nominee.voters?.length ?? 0})
-                    </span>
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <span className="text-xs text-zinc-500">
+                        Share of votes
+                      </span>
+                      <span className="text-xs font-semibold tabular-nums text-emerald-300">
+                        {votePercentage.toFixed(1)}%
+                      </span>
+                    </div>
+                    <div
+                      className="h-2 overflow-hidden rounded-full bg-white/[0.07]"
+                      role="progressbar"
+                      aria-label={`${nominee.name || "Nominee"} share of votes`}
+                      aria-valuenow={Number(votePercentage.toFixed(1))}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-300 transition-[width] duration-500"
+                        style={{ width: `${votePercentage}%` }}
+                      />
+                    </div>
                   </div>
 
-                  {!nominee.voters?.length ? (
-                    <p className="text-xs text-zinc-600">
-                      No voters recorded for this nominee yet.
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {nominee.voters.map((voter) => (
-                        <div
-                          key={voter.id}
-                          className="flex items-start gap-3 rounded-xl bg-white/[0.025] p-3"
-                        >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-400">
-                            <UserRound size={15} />
-                          </div>
+                  {/* Manifesto */}
 
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-semibold text-zinc-200">
-                              {voter.name || "Anonymous voter"}
-                            </p>
+                  {nominee.manifesto && (
+                    <div className="border-t border-white/[0.06] px-5 py-4">
+                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                        Manifesto
+                      </p>
 
-                            {voter.comment ? (
-                              <div className="mt-2 flex items-start gap-2">
-                                <MessageSquare
-                                  size={12}
-                                  className="mt-0.5 shrink-0 text-zinc-600"
-                                />
-
-                                <p className="text-xs leading-5 text-zinc-500">
-                                  {voter.comment}
-                                </p>
-                              </div>
-                            ) : (
-                              <p className="mt-1 text-[11px] text-zinc-600">
-                                No comment provided.
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                      <p className="text-sm leading-6 text-zinc-400">
+                        {nominee.manifesto}
+                      </p>
                     </div>
                   )}
-                </div>
-              </article>
-            ))}
+
+                  {/* Voters */}
+
+                  <div className="border-t border-white/[0.06] p-5">
+                    <div className="mb-4 flex items-center gap-2">
+                      <Users
+                        size={15}
+                        className="text-emerald-400"
+                      />
+
+                      <h3 className="text-xs font-semibold text-zinc-300">
+                        Recorded Voters
+                      </h3>
+
+                      <span className="text-[10px] text-zinc-600">
+                        ({nominee.voters?.length ?? 0})
+                      </span>
+                    </div>
+
+                    {!nominee.voters?.length ? (
+                      <p className="text-xs text-zinc-600">
+                        No voters recorded for this nominee yet.
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {nominee.voters.map((voter) => (
+                          <div
+                            key={voter.id}
+                            className="flex items-start gap-3 rounded-xl bg-white/[0.025] p-3"
+                          >
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-400">
+                              <UserRound size={15} />
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-semibold text-zinc-200">
+                                {voter.name || "Anonymous voter"}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>

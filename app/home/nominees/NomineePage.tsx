@@ -7,6 +7,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Clock3,
+  Crown,
   Info,
   Loader2,
   MessageSquare,
@@ -298,6 +299,13 @@ export default function NomineesPage() {
     (total, nominee) => total + (nominee.voters?.length ?? 0),
     0
   );
+  const highestVoteCount = nominees[0]?.voters?.length ?? 0;
+  const leadersCount =
+    highestVoteCount > 0
+      ? nominees.filter(
+          (nominee) => (nominee.voters?.length ?? 0) === highestVoteCount
+        ).length
+      : 0;
 
   const openVoteModal = async (nominee: Nominee) => {
     if (!currentProject?.id || submitting || hasVoted) return;
@@ -696,8 +704,10 @@ export default function NomineesPage() {
           </div>
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
-            {nominees.map((nominee, index) => {
+            {nominees.map((nominee) => {
               const voteCount = nominee.voters?.length ?? 0;
+              const isLeader =
+                voteCount > 0 && voteCount === highestVoteCount;
 
               const percentage =
                 totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
@@ -721,9 +731,12 @@ export default function NomineesPage() {
                             {nominee.name || "Unnamed nominee"}
                           </h3>
 
-                          {index === 0 && voteCount > 0 && (
-                            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-2 py-1 text-[10px] font-semibold text-emerald-300">
-                              Leading
+                          {isLeader && (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-yellow-300/20 bg-yellow-300/[0.07] px-2 py-1 text-[10px] font-semibold text-yellow-200">
+                              <Crown size={12} />
+                              {leadersCount > 1
+                                ? "Tied for first"
+                                : "First place"}
                             </span>
                           )}
                         </div>
