@@ -12,11 +12,6 @@ interface DashboardShellProps {
 }
 
 const STORAGE_KEY = "votesphere-navigation-position";
-const NOMINEE_INDICATOR_ROUTES = [
-  "/home/share",
-  "/home/history",
-  "/home/settings",
-];
 
 export default function DashboardShell({ children }: DashboardShellProps) {
   const { taskKey, project } = useApp();
@@ -25,16 +20,14 @@ export default function DashboardShell({ children }: DashboardShellProps) {
   const [position, setPosition] = useState<NavigationPosition>("left");
   const [ready, setReady] = useState(false);
 
-  const isIndicatorRoute =
-    pathname === "/home" ||
-    NOMINEE_INDICATOR_ROUTES.some(
-      (route) => pathname === route || pathname.startsWith(`${route}/`)
-    );
+  const isNomineesRoute =
+    pathname === "/home/nominees" ||
+    pathname.startsWith("/home/nominees/");
 
   const showNomineesIndicator =
     taskKey === true &&
     Boolean(project && project.length > 0) &&
-    isIndicatorRoute;
+    !isNomineesRoute;
 
   useEffect(() => {
     let savedPosition: NavigationPosition | null = null;

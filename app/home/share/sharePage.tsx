@@ -123,6 +123,22 @@ export default function SharePage() {
   return (
     <main className="relative isolate flex min-h-[calc(100dvh-8rem)] items-center justify-center overflow-hidden px-3 py-8 sm:px-6">
       <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/[0.055] blur-[130px]" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[8%] top-[17%] -z-10 h-12 w-12 rounded-full border border-emerald-300/15 bg-emerald-400/[0.04]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[9%] top-[24%] -z-10 h-20 w-20 rounded-full border border-emerald-300/10 bg-emerald-400/[0.035]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[14%] left-[15%] -z-10 h-7 w-7 rounded-full border border-emerald-300/15 bg-emerald-400/[0.05]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[19%] right-[13%] -z-10 h-14 w-14 rounded-full border border-emerald-300/10 bg-emerald-400/[0.035]"
+      />
 
       <div className="w-full max-w-3xl">
         <header className="mb-8 text-center sm:mb-10">
@@ -179,6 +195,14 @@ export default function SharePage() {
           <section className="relative mx-auto max-w-2xl overflow-hidden rounded-[2rem] border border-white/[0.09] bg-[#0d1310]/85 p-4 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-8">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/50 to-transparent" />
             <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-400/[0.07] blur-[90px]" />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -left-4 top-[38%] h-9 w-9 rounded-full border border-emerald-300/15 bg-emerald-400/[0.05]"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-[18%] right-5 h-5 w-5 rounded-full border border-emerald-300/20 bg-emerald-400/[0.06]"
+            />
 
             <div className="relative text-center">
               <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">

@@ -1027,49 +1027,6 @@ export default function ActiveProject() {
                     </div>
                   )}
 
-                  {/* Voters */}
-
-                  <div className="border-t border-white/[0.06] p-5">
-                    <div className="mb-4 flex items-center gap-2">
-                      <Users
-                        size={15}
-                        className="text-emerald-400"
-                      />
-
-                      <h3 className="text-xs font-semibold text-zinc-300">
-                        Recorded Voters
-                      </h3>
-
-                      <span className="text-[10px] text-zinc-600">
-                        ({nominee.voters?.length ?? 0})
-                      </span>
-                    </div>
-
-                    {!nominee.voters?.length ? (
-                      <p className="text-xs text-zinc-600">
-                        No voters recorded for this nominee yet.
-                      </p>
-                    ) : (
-                      <div className="space-y-3">
-                        {nominee.voters.map((voter) => (
-                          <div
-                            key={voter.id}
-                            className="flex items-start gap-3 rounded-xl bg-white/[0.025] p-3"
-                          >
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-400">
-                              <UserRound size={15} />
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-semibold text-zinc-200">
-                                {voter.name || "Anonymous voter"}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </article>
               );
             })}

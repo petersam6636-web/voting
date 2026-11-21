@@ -454,7 +454,7 @@ export default function NomineesPage() {
   };
 
   const handleDetails = (nomineeId: string) => {
-    router.push(`/home/${nomineeId}`);
+    router.push(`/home/nominees/${nomineeId}`);
   };
 
   const handleRefresh = async () => {
