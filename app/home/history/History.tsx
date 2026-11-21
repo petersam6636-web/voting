@@ -196,53 +196,37 @@ export default function HistoryPage() {
 
   // Animate the active section whenever the user changes sections.
 
-  // Exclude the project with the earliest valid creation date.
-  const historyProjects = useMemo(() => {
-    const projects = project ?? [];
-
-    if (projects.length === 0) return [];
-
-    const validDates = projects
-      .map((item) => ({
-        id: item.id,
-        timestamp: new Date(item.created_at).getTime(),
-      }))
-      .filter((item) => Number.isFinite(item.timestamp));
-
-    if (validDates.length === 0) return projects;
-
-    const oldestProject = validDates.reduce((oldest, current) =>
-      current.timestamp < oldest.timestamp ? current : oldest
-    );
-
-    return projects.filter((item) => item.id !== oldestProject.id);
-  }, [project]);
-
+  // The newest project is the current workspace project, not history.
   const activeProjectId = useMemo(() => {
     const projects = project ?? [];
 
-    if (projects.length === 0) return null;
+    const newestProject = [...projects]
+      .filter((item) => item.deleted !== true)
+      .sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        const timestampA = Number.isFinite(dateA)
+          ? dateA
+          : Number.NEGATIVE_INFINITY;
+        const timestampB = Number.isFinite(dateB)
+          ? dateB
+          : Number.NEGATIVE_INFINITY;
 
-    const earliestProject = [...projects].sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
-      const timestampA = Number.isFinite(dateA)
-        ? dateA
-        : Number.POSITIVE_INFINITY;
-      const timestampB = Number.isFinite(dateB)
-        ? dateB
-        : Number.POSITIVE_INFINITY;
+        return timestampB - timestampA;
+      })[0];
 
-      return timestampA - timestampB;
-    })[0];
-
-    return earliestProject?.id ?? null;
+    return newestProject?.id ?? null;
   }, [project]);
 
-  const projectsToDelete = useMemo(
-    () => historyProjects.filter((item) => item.id !== activeProjectId),
-    [historyProjects, activeProjectId]
+  const historyProjects = useMemo(
+    () =>
+      (project ?? []).filter(
+        (item) => item.deleted !== true && item.id !== activeProjectId
+      ),
+    [project, activeProjectId]
   );
+
+  const projectsToDelete = historyProjects;
 
   // Search history projects.
   const filteredProjects = useMemo(() => {
