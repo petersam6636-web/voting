@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
+  Award,
   CheckCircle2,
   Clock3,
   Info,
@@ -88,27 +89,34 @@ export default function QRPage({ projectId }: QRPageProps) {
       throw new Error("No election ID was provided.");
     }
 
-    const { data, error } = await supabase
+    const { data: projectData, error: projectError } = await supabase
       .from("projects")
-      .select(`
-        *,
-        nominees (
-          *,
-          achievements (*),
-          voters (*)
-        )
-      `)
+      .select("*")
       .eq("id", projectId)
       .eq("deleted", false)
       .maybeSingle();
 
-    if (error) throw error;
+    if (projectError) throw projectError;
 
-    if (!data) {
+    if (!projectData) {
       throw new Error("This election could not be found or is no longer available.");
     }
 
-    const updatedProject = data as Project;
+    const { data: nomineeData, error: nomineeError } = await supabase
+      .from("nominees")
+      .select(`
+        *,
+        achievements (*),
+        voters (comment)
+      `)
+      .eq("project_id", projectId);
+
+    if (nomineeError) throw nomineeError;
+
+    const updatedProject = {
+      ...projectData,
+      nominees: nomineeData ?? [],
+    } as Project;
 
     setCurrentProject(updatedProject);
 
@@ -602,6 +610,9 @@ export default function QRPage({ projectId }: QRPageProps) {
           <div className="grid gap-4 lg:grid-cols-2">
             {nominees.map((nominee, index) => {
               const voteCount = nominee.voters?.length ?? 0;
+              const comments = (nominee.voters ?? [])
+                .map((voter) => voter.comment?.trim())
+                .filter((comment): comment is string => Boolean(comment));
 
               const percentage =
                 totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
@@ -615,9 +626,20 @@ export default function QRPage({ projectId }: QRPageProps) {
 
                   <div className="relative">
                     <div className="flex items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.08] text-emerald-300">
-                        <Users size={22} />
-                      </div>
+                      {nominee.image ? (
+                        <img
+                          src={nominee.image}
+                          alt={nominee.name || "Nominee"}
+                          loading="lazy"
+                          className="h-12 w-12 shrink-0 rounded-2xl border border-emerald-400/15 object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.08] text-lg font-semibold text-emerald-300">
+                          {nominee.name?.trim().charAt(0).toUpperCase() || (
+                            <Users size={22} />
+                          )}
+                        </div>
+                      )}
 
                       <div className="min-w-0 flex-1">
                         <div className="mb-1 flex flex-wrap items-center gap-2">
@@ -659,6 +681,54 @@ export default function QRPage({ projectId }: QRPageProps) {
                           "This nominee has not provided a description yet."}
                       </p>
                     </div>
+
+                    {(nominee.achievements?.length ?? 0) > 0 && (
+                      <section className="mt-5">
+                        <h4 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-300/55">
+                          <Award size={14} />
+                          Achievements
+                        </h4>
+                        <ul className="space-y-2">
+                          {nominee.achievements?.map((achievement) => (
+                            <li
+                              key={achievement.id}
+                              className="rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2 text-sm leading-5 text-white/55"
+                            >
+                              {achievement.project}
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+
+                    <section className="mt-5">
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <h4 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                          <MessageSquare size={14} />
+                          Voter comments
+                        </h4>
+                        <span className="text-[11px] text-white/30">
+                          {comments.length}
+                        </span>
+                      </div>
+
+                      {comments.length > 0 ? (
+                        <ul className="max-h-40 space-y-2 overflow-y-auto">
+                          {comments.map((comment, commentIndex) => (
+                            <li
+                              key={`${nominee.id}-comment-${commentIndex}`}
+                              className="whitespace-pre-wrap break-words rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2 text-sm leading-5 text-white/55"
+                            >
+                              {comment}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-xs text-white/30">
+                          No comments yet.
+                        </p>
+                      )}
+                    </section>
 
                     {/* Vote progress */}
                     <div className="mt-6">
