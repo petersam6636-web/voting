@@ -457,7 +457,7 @@ export default function BiewPage({ nomineeId }: DetailsProps) {
         <div className="mb-7 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <Link
-              href={`/home/nominees/${linkingId ?? currentProject.id}`}
+              href={`/home/share/${linkingId ?? currentProject.id}`}
               className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.035] px-4 py-2 text-xs font-medium text-gray-300 transition hover:border-emerald-400/30 hover:bg-emerald-400/10 hover:text-emerald-300"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
