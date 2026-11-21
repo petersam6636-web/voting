@@ -26,6 +26,9 @@ export type AppContextType = {
 
   currentProject: Project | null;
   setCurrentProject: Dispatch<SetStateAction<Project | null>>;
+
+  linkingId: string;
+  setLinkingId: Dispatch<SetStateAction<string>>;
 };
 
 export const appContext = createContext<AppContextType | undefined>(

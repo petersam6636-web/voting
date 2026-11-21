@@ -26,6 +26,8 @@ export default function ContextFile({
   const [currentProject, setCurrentProject] =
     useState<Project | null>(null);
 
+  const [linkingId, setLinkingId] = useState<string>("");
+
   return (
     <appContext.Provider
       value={{
@@ -43,6 +45,9 @@ export default function ContextFile({
 
         currentProject,
         setCurrentProject,
+
+        linkingId,
+        setLinkingId,
       }}
     >
       {children}

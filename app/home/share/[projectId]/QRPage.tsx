@@ -16,7 +16,7 @@ import {
   Vote,
   X,
 } from "lucide-react";
-
+import useApp from "@/lib/useApp";
 import { supabase } from "@/lib/supabase-client";
 import type { Achievement, Nominee, Project } from "@/types/project";
 import ProjectLoading from "@/components/ProjectLoading";
@@ -100,7 +100,7 @@ function formatDate(date: string | null | undefined) {
 
 export default function QRPage({ projectId }: QRPageProps) {
   const router = useRouter();
-
+const {linkingId} = useApp()
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [loadingProject, setLoadingProject] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -473,7 +473,7 @@ export default function QRPage({ projectId }: QRPageProps) {
   };
 
   const handleDetails = (nomineeId: string) => {
-    router.push(`/home/${nomineeId}`);
+    router.push(`/home/nominees/${linkingId ?? currentProject.id}`);
   };
 
   const handleRefresh = async () => {
