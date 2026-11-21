@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase-client";
-import type { Nominee, Project } from "@/types/project";
+import type { Achievement, Nominee, Project } from "@/types/project";
 import ProjectLoading from "@/components/ProjectLoading";
 
 type QRPageProps = {
@@ -34,6 +34,43 @@ type VoteCheckResult = {
   hasVoted: boolean;
   voterId: string;
 };
+
+type VoterCommentRow = {
+  nominee_id: string;
+  comment: string | null;
+};
+
+type QueryPage<T> = {
+  data: T[] | null;
+  error: { message: string } | null;
+};
+
+const QUERY_PAGE_SIZE = 100;
+
+async function fetchAllPages<T>(
+  fetchPage: (
+    from: number,
+    to: number
+  ) => PromiseLike<QueryPage<T>>
+): Promise<T[]> {
+  const rows: T[] = [];
+  let offset = 0;
+
+  while (true) {
+    const { data, error } = await fetchPage(
+      offset,
+      offset + QUERY_PAGE_SIZE - 1
+    );
+
+    if (error) throw error;
+
+    const page = data ?? [];
+    if (page.length === 0) return rows;
+
+    rows.push(...page);
+    offset += page.length;
+  }
+}
 
 const getVoteStorageKey = (projectId: string | number) =>
   `votesphere-voted-${projectId}`;
@@ -102,20 +139,66 @@ export default function QRPage({ projectId }: QRPageProps) {
       throw new Error("This election could not be found or is no longer available.");
     }
 
-    const { data: nomineeData, error: nomineeError } = await supabase
-      .from("nominees")
-      .select(`
-        *,
-        achievements (*),
-        voters (comment)
-      `)
-      .eq("project_id", projectId);
+    const nomineeData = await fetchAllPages<Nominee>((from, to) =>
+      supabase
+        .from("nominees")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: true })
+        .range(from, to)
+    );
 
-    if (nomineeError) throw nomineeError;
+    const nomineeIds = nomineeData.map((nominee) => nominee.id);
+    let achievementData: Achievement[] = [];
+    let voterData: VoterCommentRow[] = [];
+
+    if (nomineeIds.length > 0) {
+      [achievementData, voterData] = await Promise.all([
+        fetchAllPages<Achievement>((from, to) =>
+          supabase
+            .from("achievements")
+            .select("*")
+            .in("nominee_id", nomineeIds)
+            .order("created_at", { ascending: true })
+            .range(from, to)
+        ),
+        fetchAllPages<VoterCommentRow>((from, to) =>
+          supabase
+            .from("voters")
+            .select("nominee_id, comment")
+            .eq("project_id", projectId)
+            .range(from, to)
+        ),
+      ]);
+    }
+
+    const achievementsByNominee = new Map<string, Achievement[]>();
+    for (const achievement of achievementData) {
+      const nomineeAchievements =
+        achievementsByNominee.get(achievement.nominee_id) ?? [];
+      nomineeAchievements.push(achievement);
+      achievementsByNominee.set(
+        achievement.nominee_id,
+        nomineeAchievements
+      );
+    }
+
+    const votersByNominee = new Map<string, VoterCommentRow[]>();
+    for (const voter of voterData) {
+      const nomineeVoters = votersByNominee.get(voter.nominee_id) ?? [];
+      nomineeVoters.push(voter);
+      votersByNominee.set(voter.nominee_id, nomineeVoters);
+    }
+
+    const nomineesWithData = nomineeData.map((nominee) => ({
+      ...nominee,
+      achievements: achievementsByNominee.get(nominee.id) ?? [],
+      voters: votersByNominee.get(nominee.id) ?? [],
+    }));
 
     const updatedProject = {
       ...projectData,
-      nominees: nomineeData ?? [],
+      nominees: nomineesWithData,
     } as Project;
 
     setCurrentProject(updatedProject);
