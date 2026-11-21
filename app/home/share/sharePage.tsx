@@ -140,7 +140,7 @@ export default function SharePage() {
         className="pointer-events-none absolute bottom-[19%] right-[13%] -z-10 h-14 w-14 rounded-full border border-emerald-300/10 bg-emerald-400/[0.035]"
       />
 
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-2xl">
         <header className="mb-8 text-center sm:mb-10">
 
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -184,7 +184,7 @@ export default function SharePage() {
             </p>
           </section>
         ) : (
-          <section className="relative mx-auto max-w-2xl overflow-hidden rounded-[2rem] border border-white/[0.09] bg-[#0d1310]/85 p-4 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-8">
+          <section className="relative mx-auto max-w-xl overflow-hidden rounded-[2rem] border border-white/[0.09] bg-[#0d1310]/85 p-4 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-7">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/50 to-transparent" />
             <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-400/[0.07] blur-[90px]" />
             <div
@@ -196,8 +196,7 @@ export default function SharePage() {
               className="pointer-events-none absolute bottom-[18%] right-5 h-5 w-5 rounded-full border border-emerald-300/20 bg-emerald-400/[0.06]"
             />
 
-
-
+            <div className="relative z-10 text-center">
               <h2 className="mx-auto max-w-xl break-words text-xl font-semibold tracking-tight text-white sm:text-2xl">
                 {currentProject.name || "Untitled election"}
               </h2>
@@ -206,16 +205,16 @@ export default function SharePage() {
                 Scan the code with a phone camera to open the voting page
               </p>
 
-              <div className="mx-auto mt-5 flex w-full max-w-[372px] justify-center rounded-[1.75rem] border border-white/10 bg-white p-3 shadow-[0_20px_70px_rgba(16,185,129,0.12)] sm:p-4">
+              <div className="mx-auto mt-5 flex w-full max-w-[320px] justify-center rounded-[1.75rem] border border-white/10 bg-white p-3 shadow-[0_20px_70px_rgba(16,185,129,0.12)] sm:p-4">
                 {shareUrl && (
                   <QRCodeSVG
                     value={shareUrl}
-                    size={360}
+                    size={300}
                     level="H"
                     includeMargin
                     bgColor="#ffffff"
                     fgColor="#07150e"
-                    className="block h-auto w-full max-w-[340px]"
+                    className="block h-auto w-full max-w-[276px]"
                   />
                 )}
               </div>
