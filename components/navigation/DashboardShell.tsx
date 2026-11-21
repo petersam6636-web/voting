@@ -20,9 +20,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
   const [position, setPosition] = useState<NavigationPosition>("left");
   const [ready, setReady] = useState(false);
 
-  const isNomineesRoute =
-    pathname === "/home/nominees" ||
-    pathname.startsWith("/home/nominees/");
+  const isNomineesRoute = pathname === "/home/nominees";
 
   const showNomineesIndicator =
     taskKey === true &&
