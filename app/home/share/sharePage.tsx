@@ -44,7 +44,7 @@ export default function SharePage() {
           .select("*")
           .eq("user_id", userData.user.id)
           .eq("deleted", false)
-          .order("created_at", { ascending: true })
+          .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
 
